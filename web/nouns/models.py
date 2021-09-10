@@ -213,7 +213,7 @@ class Relation(models.Model):
 class Channel(models.Model):
     title = models.CharField(max_length=255)
     slug = models.CharField(max_length=255)
-    nouns = models.ManyToManyField('Noun', null=True, blank=True)
+    nouns = models.ManyToManyField('Noun', blank=True)
     order = models.IntegerField()
     language = models.CharField(max_length=255, blank=True, null=True)
     is_featured = models.BooleanField(max_length=255, default=False)

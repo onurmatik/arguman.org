@@ -96,10 +96,8 @@ class Contention(DeletePreventionMixin, models.Model):
     language = models.CharField(max_length=5, null=True,
                                 choices=[(language, language) for language in
                                          settings.AVAILABLE_LANGUAGES])
-    nouns = models.ManyToManyField('nouns.Noun', blank=True, null=True,
-                                   related_name="contentions")
-    related_nouns = models.ManyToManyField('nouns.Noun', blank=True, null=True,
-                                           related_name="contentions_related")
+    nouns = models.ManyToManyField('nouns.Noun', blank=True, related_name="contentions")
+    related_nouns = models.ManyToManyField('nouns.Noun', blank=True, related_name="contentions_related")
 
     score = models.FloatField(blank=True, null=True)
     objects = LanguageManager()

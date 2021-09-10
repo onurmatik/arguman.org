@@ -179,7 +179,7 @@ class HomeView(TemplateView, PaginationMixin):
 
     def get_context_data(self, **kwargs):
         contentions = self.get_contentions()
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             notifications_qs = self.get_unread_notifications()
             notifications = list(notifications_qs)
             self.mark_as_read(notifications_qs)

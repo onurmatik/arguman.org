@@ -18,7 +18,7 @@ urlpatterns = [
     path('users/<str:username>', ProfileDetailView.as_view(template_name="auth/profile.html"), name='auth_profile'),
     path('users/<str:username>/arguments', ProfileArgumentsView.as_view(), name='auth_profile_arguments'),
     path('users/<str:username>/premises', ProfilePremisesView.as_view(), name='auth_profile_premises'),
-    path(r'^users/<str:username>/fallacies', ProfileFallaciesView.as_view(), name='auth_profile_fallacies'),
+    path('users/<str:username>/fallacies', ProfileFallaciesView.as_view(), name='auth_profile_fallacies'),
     path('users/<str:username>/channels.json', ProfileChannelsGraphView.as_view(), name='auth_profile_channels'),
     path('password_reset/', views.PasswordResetView, {
             'template_name': 'auth/password_reset_form.html',
@@ -31,7 +31,6 @@ urlpatterns = [
     path('reset/<str:uidb64>/<str:token>/', views.PasswordResetConfirmView, {
             'template_name': 'auth/password_reset_confirm.html'
         }, name='password_reset_confirm'),
-    path(r'reset/done/', views.PasswordResetCompleteView,
-        {'template_name': 'auth/password_reset_complete.html'},
-        name='password_reset_complete'),
+    path('reset/done/', views.PasswordResetCompleteView, {'template_name': 'auth/password_reset_complete.html'},
+         name='password_reset_complete'),
 ]

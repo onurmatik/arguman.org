@@ -18,10 +18,10 @@ sitemaps = {
 }
 
 urlpatterns = [
-#    path('', include('newsfeed.urls')),
+    path('', include('newsfeed.urls')),
     path('', include('premises.urls')),
     path('', include('profiles.urls')),
-#    path('blog/', include('blog.urls')),
+    path('blog/', include('blog.urls')),
     path('nouns/', include('nouns.urls')),
     path('channels/<slug:slug>', ChannelDetail.as_view(), name="channel_detail"),
     path('', include('social_django.urls')),
@@ -29,6 +29,6 @@ urlpatterns = [
 #    path('api/', include('api.urls')),
 
     # Sitemap
-#    path(r'^sitemap\.xml$', cache_page(86400)(sitemaps_views.index), {'sitemaps': sitemaps, 'sitemap_url_name': 'sitemaps'}),
-#    path(r'^sitemap-(?P<section>.+)\.xml$', cache_page(86400)(sitemaps_views.sitemap), {'sitemaps': sitemaps}, name='sitemaps'),
+#    path('sitemap\.xml', cache_page(86400)(sitemaps_views.index), {'sitemaps': sitemaps, 'sitemap_url_name': 'sitemaps'}),
+#    path('sitemap-(?P<section>.+)\.xml', cache_page(86400)(sitemaps_views.sitemap), {'sitemaps': sitemaps}, name='sitemaps'),
 ]
