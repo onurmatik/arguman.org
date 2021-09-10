@@ -1,11 +1,5 @@
 """
 Django settings for arguman project.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/1.6/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -41,7 +35,7 @@ INSTALLED_APPS = (
     'django.contrib.sitemaps',
 
     'typogrify',
-    'social_auth',
+    'social_django',
     'django_gravatar',
     'rest_framework',
     'rest_framework.authtoken',
@@ -50,10 +44,10 @@ INSTALLED_APPS = (
     'nouns',
     'newsfeed',
     'blog',
-    'api',
+#    'api',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -116,7 +110,7 @@ LANGUAGE_CODE_MAPPING = {
 }
 
 LANGUAGE_CODE_MAPPING_REVERSED = {
-    v.lower(): k for k, v in LANGUAGE_CODE_MAPPING.iteritems()
+    v.lower(): k for k, v in LANGUAGE_CODE_MAPPING.items()
 }
 
 TIME_ZONE = 'UTC'
@@ -134,14 +128,27 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(os.path.dirname(__file__), "../static"),
+    os.path.join(BASE_DIR, "../static"),
 )
 
 
-TEMPLATE_DIRS = (
-    os.path.join(os.path.dirname(__file__), "../templates"),
-)
-
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, "templates"),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 # Social Auth Settings
 AUTHENTICATION_BACKENDS = (
@@ -244,7 +251,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'null': {
-            'class': 'django.utils.log.NullHandler',
+            'class': 'logging.NullHandler',
         },
     },
     'loggers': {
@@ -256,6 +263,6 @@ LOGGING = {
 }
 
 try:
-    from settings_local import *
+    from .settings_local import *
 except ImportError:
-    print "settings_local.py not found!"
+    print("settings_local.py not found!")

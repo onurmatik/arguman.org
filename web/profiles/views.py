@@ -1,7 +1,7 @@
 import json
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse
 from django.utils.translation import get_language
 from django.views.generic import (

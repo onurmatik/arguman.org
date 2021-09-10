@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Count
+from django.urls import reverse
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from premises.models import Report, Premise
@@ -13,8 +12,6 @@ from premises.signals import (reported_as_fallacy, added_premise_for_premise,
                               supported_a_premise)
 from profiles.signals import follow_done
 from django.utils.translation import ugettext_lazy as _
-
-from django.core.mail import send_mail
 
 
 class Profile(AbstractUser):
@@ -47,9 +44,8 @@ class Profile(AbstractUser):
         return self.premise_set.aggregate(Count('supporters'))[
             'supporters__count']
 
-    @models.permalink
     def get_absolute_url(self):
-        return "auth_profile", [self.username]
+        return reverse("auth_profile", args=[self.username])
 
     def calculate_karma(self):
         # CALCULATES THE KARMA POINT OF USER
@@ -94,11 +90,17 @@ NOTIFICATION_TYPES = (
 
 class Notification(models.Model):
     # sender can be `null` for system notifications
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL,
-                               null=True, blank=True,
-                               related_name="sent_notifications")
-    recipient = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                  related_name="notifications")
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        related_name="sent_notifications",
+    )
+    recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="notifications",
+    )
     date_created = models.DateTimeField(auto_now_add=True)
     notification_type = models.IntegerField(choices=NOTIFICATION_TYPES)
     is_read = models.BooleanField(default=False)

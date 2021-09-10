@@ -3,15 +3,6 @@ POSTMARK_TOKEN = "xyz"
 POSTMARK_API_URL = "https://api.postmarkapp.com/email"
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db',
-        'PORT': 5432,
-    }
-}
 ALLOWED_HOSTS = ['*']
 DEBUG = True
 

@@ -1,5 +1,4 @@
 from django.template.defaultfilters import slugify
-from unidecode import unidecode
 
 from django.template.defaulttags import register
 from django_gravatar.helpers import GRAVATAR_DEFAULT_SIZE, get_gravatar_url
@@ -62,7 +61,7 @@ def parse_markdown_tabs(text):
     for tab in text.split(start)[1:]:
         title, content = tab.split(end)
 
-        slug = slugify(unidecode(title))
+        slug = slugify(title)
 
         titles.append(title_template % {
             'name': title,

@@ -6,17 +6,16 @@ from math import log
 from operator import itemgetter
 from uuid import uuid4
 from markdown2 import markdown
-from unidecode import unidecode
 
 from django.utils.html import escape
 from django.core import validators
+from django.urls import reverse
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.db import models
 from django.db.models import Count, Q
 from django.template.defaultfilters import slugify
-from django.utils.encoding import smart_unicode
-from django.utils.functional import curry
+from functools import partialmethod
 from django.utils.translation import ugettext_lazy as _, get_language
 from django.utils.html import strip_tags
 from i18n.utils import normalize_language_code
@@ -75,7 +74,11 @@ class Contention(DeletePreventionMixin, models.Model):
     slug = models.SlugField(max_length=255, blank=True)
     description = models.TextField(
         null=True, blank=True, verbose_name=_("Description"), )
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="arguments")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="arguments",
+        on_delete=models.CASCADE,
+    )
     owner = models.CharField(
         max_length=255, null=True, blank=True,
         verbose_name=_("Original Discourse"),
@@ -104,8 +107,8 @@ class Contention(DeletePreventionMixin, models.Model):
     class Meta:
         ordering = ["-date_creation"]
 
-    def __unicode__(self):
-        return smart_unicode(self.title)
+    def __str__(self):
+        return self.title
 
     def get_premises(self):
         return (
@@ -195,9 +198,8 @@ class Contention(DeletePreventionMixin, models.Model):
             'status': status
         }
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'contention_detail', [self.slug]
+        return reverse('contention_detail', args=[self.slug])
 
     def epoch_seconds(self, date):
         """Returns the number of seconds from the epoch to date."""
@@ -226,7 +228,7 @@ class Contention(DeletePreventionMixin, models.Model):
         - Make unique slug if it is not given.
         """
         if not self.slug:
-            slug = slugify(unidecode(self.title))
+            slug = slugify(self.title)
             duplications = Contention.objects.filter(slug=slug)
             if duplications.exists():
                 self.slug = "%s-%s" % (slug, uuid4().hex)
@@ -250,11 +252,11 @@ class Contention(DeletePreventionMixin, models.Model):
         return (self.published_premises(ignore_parent=ignore_parent)
                 .filter(premise_type=premise_type))
 
-    because = curry(children_by_premise_type,
+    because = partialmethod(children_by_premise_type,
                     premise_type=SUPPORT, ignore_parent=True)
-    but = curry(children_by_premise_type,
+    but = partialmethod(children_by_premise_type,
                 premise_type=OBJECTION, ignore_parent=True)
-    however = curry(children_by_premise_type,
+    however = partialmethod(children_by_premise_type,
                     premise_type=SITUATION, ignore_parent=True)
 
     def update_sibling_counts(self):
@@ -386,7 +388,7 @@ class Contention(DeletePreventionMixin, models.Model):
 
         return title
 
-    highlighted_title = curry(formatted_title, tag='span')
+    highlighted_title = partialmethod(formatted_title, tag='span')
 
     def related_contentions(self):
         if self.related_nouns.exists():
@@ -453,10 +455,11 @@ class Contention(DeletePreventionMixin, models.Model):
 
 
 class Premise(DeletePreventionMixin, models.Model):
-    argument = models.ForeignKey(Contention, related_name="premises")
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_premises')
+    argument = models.ForeignKey(Contention, related_name="premises", on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_premises', on_delete=models.CASCADE)
     parent = models.ForeignKey("self", related_name="children",
                                null=True, blank=True,
+                               on_delete=models.CASCADE,
                                verbose_name=_("Parent"),
                                help_text=_("The parent of premise. If you don't choose " +
                                            "anything, it will be a main premise."))
@@ -474,6 +477,7 @@ class Premise(DeletePreventionMixin, models.Model):
         help_text=render_to_string("premises/examples/premise_source.html"))
     related_argument = models.ForeignKey(Contention, related_name="related_premises",
                                          blank=True, null=True,
+                                         on_delete=models.CASCADE,
                                          verbose_name=_('Related Argument'),
                                          help_text=_("You can also associate your premise "
                                                      "with an argument."))
@@ -490,8 +494,8 @@ class Premise(DeletePreventionMixin, models.Model):
 
     objects = DeletePreventionManager()
 
-    def __unicode__(self):
-        return smart_unicode(self.text)
+    def __str__(self):
+        return self.text
 
     def is_collapsed(self):
         return self.report_count > 3
@@ -542,9 +546,8 @@ class Premise(DeletePreventionMixin, models.Model):
             'related_argument': related_argument
         }
 
-    @models.permalink
     def get_absolute_url(self):
-        return 'premise_detail', [self.argument.slug, self.pk]
+        return reverse('premise_detail', args=[self.argument.slug, self.pk])
 
     def get_list_url(self):
         return '%s?view=list' % self.get_absolute_url()
@@ -668,9 +671,9 @@ class Premise(DeletePreventionMixin, models.Model):
         # self.save_karma_tree()
         return super(Premise, self).save(*args, **kwargs)
 
-    because = curry(children_by_premise_type, premise_type=SUPPORT)
-    but = curry(children_by_premise_type, premise_type=OBJECTION)
-    however = curry(children_by_premise_type, premise_type=SITUATION)
+    because = partialmethod(children_by_premise_type, premise_type=SUPPORT)
+    but = partialmethod(children_by_premise_type, premise_type=OBJECTION)
+    however = partialmethod(children_by_premise_type, premise_type=SITUATION)
 
     def update_weight(self):
         weight = 1 + self.supporters.count() - self.reports.count()
@@ -691,16 +694,23 @@ class Premise(DeletePreventionMixin, models.Model):
 
 
 class Report(models.Model):
-    reporter = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                 related_name='reports')
-    premise = models.ForeignKey(Premise,
-                                related_name='reports',
-                                blank=True,
-                                null=True)
-    contention = models.ForeignKey(Contention,
-                                   related_name='reports',
-                                   blank=True,
-                                   null=True)
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reports',
+    )
+    premise = models.ForeignKey(
+        Premise,
+        on_delete=models.SET_NULL,
+        blank=True, null=True,
+        related_name='reports',
+    )
+    contention = models.ForeignKey(
+        Contention,
+        blank=True, null=True,
+        on_delete=models.SET_NULL,
+        related_name='reports',
+    )
     reason = models.TextField(verbose_name=_("Reason"), null=True, blank=False,
                               help_text=_('Please explain that why the premise is a fallacy.'))
     fallacy_type = models.CharField(
@@ -708,8 +718,8 @@ class Report(models.Model):
         max_length=255, default="Wrong Direction",
         help_text=render_to_string("premises/examples/fallacy.html"))
 
-    def __unicode__(self):
-        return smart_unicode(self.fallacy_type)
+    def __str__(self):
+        return self.fallacy_type
 
     def save_karma(self):
         karma = self.premise.user.calculate_karma()

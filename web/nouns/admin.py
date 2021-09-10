@@ -54,7 +54,7 @@ class ActionInChangeFormMixin(object):
 
 
 class NounAdmin(ActionInChangeFormMixin, admin.ModelAdmin):
-    list_display = ('__unicode__', 'is_active', 'hypernyms_as_text')
+    list_display = ('__str__', 'is_active', 'hypernyms_as_text')
     list_filter = ('is_active', )
     inlines = [KeywordInline, ContentionInline, RelationInline]
     actions = ['update_contentions', 'reset_contentions',

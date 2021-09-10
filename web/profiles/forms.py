@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import re
 
 from django import forms
@@ -20,7 +18,7 @@ class AuthenticationForm(BaseAuthenticationForm):
 class RegistrationForm(UserCreationForm):
     username = forms.RegexField(
         label=_("Username"),
-        max_length=30, regex=re.compile(r'^[\w\s-]+$', re.LOCALE),
+        max_length=30, regex=re.compile(r'^[\w\s-]+$'),
         help_text=_('Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.'),
         error_messages={
             'invalid': _("Invalid characters")

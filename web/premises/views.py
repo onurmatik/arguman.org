@@ -1,5 +1,3 @@
-# -*- coding:utf-8 -*-
-
 import json
 from datetime import timedelta
 from django.conf import settings
@@ -7,7 +5,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from markdown2 import markdown
 
 from django.contrib import messages
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from django.db.models import Max, Sum
 from django.utils.timezone import now
