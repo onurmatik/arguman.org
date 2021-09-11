@@ -153,7 +153,7 @@ TEMPLATES = [
 
 # Social Auth Settings
 AUTHENTICATION_BACKENDS = (
-    'social_auth.backends.twitter.TwitterBackend',
+    'social_core.backends.twitter.TwitterOAuth',
     'django.contrib.auth.backends.ModelBackend',
 )
 
