@@ -78,7 +78,7 @@ class BaseProfileDetailView(DetailView):
 
         can_follow = self.request.user != user
 
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             is_followed = self.request.user.following.filter(
                 pk=user.id).exists()
         else:

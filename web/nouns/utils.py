@@ -1,5 +1,4 @@
-# -*- coding:utf-8 -*-
-import operator
+from functools import reduce
 import string
 import operator
 import itertools

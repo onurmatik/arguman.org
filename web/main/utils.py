@@ -18,8 +18,8 @@ def send_complex_mail(subject,
     context = {} if not context else context
     subject, from_email = subject, _from
     context['BASE_URL'] = settings.BASE_DOMAIN
-    text_content = render_to_string(template_txt, Context(context))
-    html_content = render_to_string(template_html, Context(context))
+    text_content = render_to_string(template_txt, context)
+    html_content = render_to_string(template_html, context)
 
     msg = EmailMultiAlternatives(subject,
                                  text_content,

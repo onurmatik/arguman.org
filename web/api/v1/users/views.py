@@ -94,7 +94,7 @@ class UserArgumentsView(viewsets.ModelViewSet):
     def user_arguments(self, request, username=None):
         user = self.get_object()
         arguments = user.contention_set.filter()
-        if not(self.request.user.is_authenticated() and
+        if not(self.request.user.is_authenticated and
                 user == self.request.user):
             arguments = arguments.filter(is_published=True)
         page = self.paginate_queryset(arguments)

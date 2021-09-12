@@ -13,7 +13,7 @@ class NewsfeedView(HomeView):
             **kwargs)
 
     def get_news_entries(self):
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             newsfeed = Entry.objects.get_private_newsfeed(
                 offset=self.get_offset(), limit=self.paginate_by,
                 user=self.request.user)
@@ -27,7 +27,7 @@ class NewsfeedView(HomeView):
         # if the page loaded full, probably there are more news
         # entries. if not, returns a single empty page, it's not a problem.
         # it's more effortless instead of get all collection for now.
-        return (len(self.get_news_entries()) == self.paginate_by)
+        return len(list(self.get_news_entries())) == self.paginate_by
 
 
 class PublicNewsfeedView(NewsfeedView):

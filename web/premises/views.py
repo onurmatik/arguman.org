@@ -160,7 +160,7 @@ class ContentionJsonView(DetailView):
         return children
 
     def user_can_report(self, premise, user):
-        if user.is_authenticated() and user != premise.user:
+        if user.is_authenticated and user != premise.user:
             return not premise.reported_by(user)
 
         return False
@@ -635,8 +635,8 @@ class RandomArgumentView(RedirectView):
             language=normalize_language_code(get_language())
         ).order_by(
             '?'
-        )[0]
-        return argument.get_absolute_url()
+        ).first()
+        return argument and argument.get_absolute_url()
 
 
 class ArgumentPublishView(LoginRequiredMixin, DetailView):
@@ -678,8 +678,6 @@ class ArgumentDeleteView(LoginRequiredMixin, DetailView):
         else:
             messages.info(request, u"Argument cannot be deleted.")
             return redirect(contention)
-
-    delete = post
 
 
 class PremiseEditView(LoginRequiredMixin, UpdateView):
