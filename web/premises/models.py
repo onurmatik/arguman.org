@@ -699,14 +699,14 @@ class Report(models.Model):
     )
     premise = models.ForeignKey(
         Premise,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         blank=True, null=True,
         related_name='reports',
     )
     contention = models.ForeignKey(
         Contention,
         blank=True, null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name='reports',
     )
     reason = models.TextField(verbose_name=_("Reason"), null=True, blank=False,
